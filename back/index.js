@@ -25,42 +25,65 @@ function apiCallTime() {
 	return callTime - new Date();
 }
 
-setTimeout(() => {
-	let tempDate = new Date()
-	let updateId
-
-	db.insert({prediction: 0, actual: 0}, (err, newDoc) => {
-		updateId = newDoc._id
+function calculateAccuracy() {
+	let sum = 0
+	let count = 0
+	 db.find({}, (err, docs) => {
+		for (const key of docs) {
+			console.log(key.prediction)
+			sum += key.actual - key.prediction;
+			count++;
+		}
+		console.log(sum / count)
+		
 	})
+	
+	return sum / count;
+}
 
-	fetch(`http://api.weatherapi.com/v1/history.json?key=${process.env.WEATHERAPI_KEY}&q=Tallinn&dt=${tempDate.getFullYear()}-${tempDate.getMonth() + 1}-${tempDate.getDate()}`)
-		.then(response => (
-			response.json()
-		)).then(res => (
-			db.update(
-				{
-					_id: updateId
-				},
-				{
-					$set: { prediction: res.forecast.forecastday[0].hour[12].temp_c }
-				}
-			))
-		)
-	fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHERAPI_KEY}&q=Tallinn`)
-		.then(response => (
-			response.json()
-		)).then(res => (
-			db.update(
-				{
-					_id: updateId
-				},
-				{
-					$set: { actual: res.current.temp_c }
-				}
-			))
-		)
-}, apiCallTime());
+function fetchWeather() {
+	setTimeout(() => {
+		let tempDate = new Date()
+		let updateId
 
+		db.insert({ prediction: 0, actual: 0 }, (err, newDoc) => {
+			updateId = newDoc._id
+		})
+
+		fetch(`http://api.weatherapi.com/v1/history.json?key=${process.env.WEATHERAPI_KEY}&q=Tallinn&dt=${tempDate.getFullYear()}-${tempDate.getMonth() + 1}-${tempDate.getDate()}`)
+			.then(response => (
+				response.json()
+			)).then(res => (
+				db.update(
+					{
+						_id: updateId
+					},
+					{
+						$set: { prediction: res.forecast.forecastday[0].hour[12].temp_c }
+					}
+				))
+			)
+		fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHERAPI_KEY}&q=Tallinn`)
+			.then(response => (
+				response.json()
+			)).then(res => (
+				db.update(
+					{
+						_id: updateId
+					},
+					{
+						$set: { actual: res.current.temp_c }
+					}
+				))
+			)
+		fetchWeather()
+	}, apiCallTime());
+}
+fetchWeather()
+
+app.get('/weatherapi', async (req, res) => {
+	res.send(calculateAccuracy().toString())
+})
 
 
 app.listen(5000, function () {
