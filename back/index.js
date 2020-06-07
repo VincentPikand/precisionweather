@@ -24,23 +24,6 @@ function apiCallTime() {
 	console.log(callTime);
 	return callTime - new Date();
 }
-
-function calculateAccuracy() {
-	let sum = 0
-	let count = 0
-	 db.find({}, (err, docs) => {
-		for (const key of docs) {
-			console.log(key.prediction)
-			sum += key.actual - key.prediction;
-			count++;
-		}
-		console.log(sum / count)
-		
-	})
-	
-	return sum / count;
-}
-
 function fetchWeather() {
 	setTimeout(() => {
 		let tempDate = new Date()
@@ -82,7 +65,17 @@ function fetchWeather() {
 fetchWeather()
 
 app.get('/weatherapi', async (req, res) => {
-	res.send(calculateAccuracy().toString())
+	db.find({}, (err, docs) => {
+		let sum = 0
+		let count = 0
+		for (const key of docs) {
+			console.log(key.prediction)
+			sum += key.actual - key.prediction;
+			count++;
+		}
+		console.log(sum / count)
+		res.send((sum/count).toString())
+	})
 })
 
 
