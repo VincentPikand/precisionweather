@@ -2,15 +2,64 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const fetch = require('node-fetch');
+const Datastore = require('nedb');
+const path = require("path");
 
-
-app.get('/weatherapi', async (req, res) => {
-	await fetch(`http://api.weatherapi.com/v1/forecast.json?key=${process.env.WEATHERAPI_KEY}&q=Tallinn&days=1`).then(response => (
-		response.json()
-	).then(response => {
-		res.send(response)
-	}))
+const db = new Datastore({
+	filename: path.join(__dirname, 'database.db'),
+	autoload: true
 })
+
+function apiCallTime() {
+	let callTime = new Date();
+
+	if (new Date().getHours() >= 12) {
+		callTime.setDate(new Date().getDate() + 1)
+
+	}
+	callTime.setHours(13)
+	callTime.setMinutes(0)
+	callTime.setSeconds(0)
+	callTime.setMilliseconds(0)
+	console.log(callTime);
+	return callTime - new Date();
+}
+
+setTimeout(() => {
+	let tempDate = new Date()
+	let updateId
+
+	db.insert({prediction: 0, actual: 0}, (err, newDoc) => {
+		updateId = newDoc._id
+	})
+
+	fetch(`http://api.weatherapi.com/v1/history.json?key=${process.env.WEATHERAPI_KEY}&q=Tallinn&dt=${tempDate.getFullYear()}-${tempDate.getMonth() + 1}-${tempDate.getDate()}`)
+		.then(response => (
+			response.json()
+		)).then(res => (
+			db.update(
+				{
+					_id: updateId
+				},
+				{
+					$set: { prediction: res.forecast.forecastday[0].hour[12].temp_c }
+				}
+			))
+		)
+	fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHERAPI_KEY}&q=Tallinn`)
+		.then(response => (
+			response.json()
+		)).then(res => (
+			db.update(
+				{
+					_id: updateId
+				},
+				{
+					$set: { actual: res.current.temp_c }
+				}
+			))
+		)
+}, apiCallTime());
 
 
 
