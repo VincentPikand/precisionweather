@@ -7,7 +7,7 @@ export default class App extends React.Component {
     super();
     this.state = {
       response: '',
-      apiResponse: {},
+      apiResponse: '',
       loading: true
     }
 
@@ -15,18 +15,17 @@ export default class App extends React.Component {
   componentDidMount() {
     
     fetch('/weatherapi').then((response) => (
-      response.json()
+      response.text()
     )).then((res) => {
       this.setState({ apiResponse: res, loading: false });
     });
   }
 
   render() {
-    if(this.state.loading) return(<p>'loading'</p>)
+    if(this.state.loading) return(<p>loading</p>)
     return (
       <div className="App">
-        {this.state.apiResponse.location.name}
-       
+        {this.state.apiResponse}
       </div>
     );
   }
