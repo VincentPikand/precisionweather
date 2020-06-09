@@ -24,6 +24,7 @@ function apiCallTime() {
 	console.log(callTime);
 	return callTime - new Date();
 }
+
 function fetchWeather() {
 	setTimeout(() => {
 		let tempDate = new Date()
@@ -69,12 +70,15 @@ app.get('/weatherapi', async (req, res) => {
 		let sum = 0
 		let count = 0
 		for (const key of docs) {
-			console.log(key.prediction)
-			sum += key.actual - key.prediction;
+			
+			sum += Math.pow((key.actual - key.prediction), 2);
+			console.log(sum)
 			count++;
 		}
-		console.log(sum / count)
-		res.send((sum/count).toString())
+		
+		let answer = Math.sqrt(sum/count)
+		console.log(answer)
+		res.send(answer.toString())
 	})
 })
 
