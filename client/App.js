@@ -18,16 +18,24 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>{response}</Text>
+      <View style={styles.top}>
+        <Text>Precision Weather</Text>
+      </View>
+      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
+    backgroundColor: '#8d8eb2',
+    flexDirection: 'column'
   },
+  top: {
+    backgroundColor: '#cecbdd',
+    height: 100,
+    width: 100,
+  }
 });
