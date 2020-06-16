@@ -28,22 +28,37 @@ function apiCallTime() {
 function fetchWeather() {
 	setTimeout(() => {
 		let tempDate = new Date()
-		let updateId
-
-		db.insert({ prediction: 0, actual: 0 }, (err, newDoc) => {
-			updateId = newDoc._id
+		let currentDate = `${tempDate.getFullYear()}-${tempDate.getMonth() + 1}-${tempDate.getDate()}`
+		tempDate.setDate(tempDate.getDate() - 1)
+		let yesterdayDate = `${tempDate.getFullYear()}-${tempDate.getMonth() + 1}-${tempDate.getDate()}`
+		
+		db.find({
+			date: currentDate
+		}, (err, docs) => {
+			if (docs.length === 0) {
+				db.insert({
+					wa_prediction: -100,
+					wa_actual: -100,
+					wb_prediction: -100,
+					wb_actual: -100,
+					date: currentDate
+				})
+			}
 		})
 
-		fetch(`http://api.weatherapi.com/v1/history.json?key=${process.env.WEATHERAPI_KEY}&q=Tallinn&dt=${tempDate.getFullYear()}-${tempDate.getMonth() + 1}-${tempDate.getDate()}`)
+
+		/* FETCH DATA FROM WEATHERAPI (WA) AND INSERT TO DATABASE */
+
+		fetch(`http://api.weatherapi.com/v1/history.json?key=${process.env.WEATHERAPI_KEY}&q=Tallinn&dt=${currentDate}`)
 			.then(response => (
 				response.json()
 			)).then(res => (
 				db.update(
 					{
-						_id: updateId
+						date: currentDate
 					},
 					{
-						$set: { prediction: res.forecast.forecastday[0].hour[12].temp_c }
+						$set: { wa_prediction: res.forecast.forecastday[0].hour[12].temp_c }
 					}
 				))
 			)
@@ -53,10 +68,41 @@ function fetchWeather() {
 			)).then(res => (
 				db.update(
 					{
-						_id: updateId
+						date: yesterdayDate
 					},
 					{
-						$set: { actual: res.current.temp_c }
+						$set: { wa_actual: res.current.temp_c }
+					}
+				))
+			)
+
+		/* FETCH DATA FROM WEATHERBIT (WB) AND INSERT TO DATABASE */
+
+		fetch(`https://api.weatherbit.io/v2.0/forecast/hourly?city=Tallinn&key=${process.env.WEATHERBIT_KEY}&hours=24`)
+			.then(response => (
+				response.json()
+			)).then(res => (
+				db.update(
+					{
+						date: currentDate
+
+					},
+					{
+						$set: { wb_prediction: res.data[23].temp }
+					}
+				)
+			))
+		fetch(`https://api.weatherbit.io/v2.0/history/hourly?city=Tallinn&start_date=${currentDate}:10&end_date=${currentDate}:11&key=${process.env.WEATHERBIT_KEY}`)
+			.then(response => (
+				response.json()
+			)).then(res => (
+				db.update(
+					{
+						date: yesterdayDate
+
+					},
+					{
+						$set: { wb_actual: res.data[0].temp }
 					}
 				))
 			)
@@ -67,18 +113,27 @@ fetchWeather()
 
 app.get('/weatherapi', async (req, res) => {
 	db.find({}, (err, docs) => {
-		let sum = 0
+		let wa_sum = 0, wb_sum = 0
 		let count = 0
-		for (const key of docs) {
-			
-			sum += Math.pow((key.actual - key.prediction), 2);
-			console.log(sum)
-			count++;
+		for (let i = 0; i < docs.length; i++) {
+			if (docs[i].wa_actual !== -100 && docs[i].wb_actual !== -100 && docs[i].wa_prediction !== -100 && docs[i].wb_prediction !== -100) {
+				wa_sum += Math.pow((docs[i].wa_actual - docs[i].wa_prediction), 2);
+				wb_sum += Math.pow((docs[i].wb_actual - docs[i].wb_prediction), 2);
+				count++;
+			}
 		}
-		
-		let answer = Math.sqrt(sum/count)
+		if (count === 0) {
+			res.send('cannot calculate')
+			return
+		}
+		let answer = {
+			wa_ans: (Math.sqrt(wa_sum / count).toFixed(1)),
+			wb_ans: (Math.sqrt(wb_sum / count).toFixed(1))
+		}
 		console.log(answer)
-		res.send(answer.toString())
+		res.send(answer)
+
+
 	})
 })
 

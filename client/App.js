@@ -18,24 +18,28 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.top}>
-        <Text>Precision Weather</Text>
+      <View style={styles.weatherapi}>
+        <Text style={styles.title}>Weather Precision</Text>
       </View>
-      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    backgroundColor: '#8d8eb2',
+    flex: 1,
+    backgroundColor: '#353839',
     flexDirection: 'column'
   },
-  top: {
-    backgroundColor: '#cecbdd',
-    height: 100,
-    width: 100,
+  weatherapi: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 44,
+    height: 50,
+    backgroundColor: '#d1a36e'
+  },
+  title: {
+    fontSize: 30,
+    fontFamily: "serif"
   }
 });
