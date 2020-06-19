@@ -106,6 +106,7 @@ function fetchWeather() {
 					}
 				))
 			)
+
 		fetchWeather()
 	}, apiCallTime());
 }
@@ -128,7 +129,9 @@ app.get('/weatherapi', async (req, res) => {
 		}
 		let answer = {
 			wa_ans: (Math.sqrt(wa_sum / count).toFixed(1)),
-			wb_ans: (Math.sqrt(wb_sum / count).toFixed(1))
+			wa_name: "weatherapi.com",
+			wb_name: "weatherbit.io",
+			wb_ans: (Math.sqrt(wb_sum / count).toFixed(1)),
 		}
 		console.log(answer)
 		res.send(answer)
