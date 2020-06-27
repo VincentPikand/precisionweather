@@ -6,7 +6,7 @@ It fetches several weather forecast API's every day at 10 AM UTC, saving the 24-
 <img src="https://github.com/VincentPikand/precisionweather/blob/master/client/assets/ss_2.jpg?raw=true" width="300" align="center">
 <img src="https://github.com/VincentPikand/precisionweather/blob/master/client/assets/ss_1.jpg?raw=true" width="300" align="center">
 ## Installation
-to launch this project, you need ``npm``, ``expo`` and ``ngrok``. <br/>
+to launch this project, you need ``npm``, ``expo``, ``ngrok`` and ``node``. A few, I know. <br/>
 
 ``cd client`` and ``npm i`` - to install dependencies for frontend<br/>
 Open a new instance of terminal/cmd, and type<br/>
