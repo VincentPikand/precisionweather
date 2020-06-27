@@ -49,9 +49,9 @@ function formulaPage() {
 
 function HomeScreen({ navigation }) {
 	const [response, setResponse] = useState({});
-	const fetchAdress = 'http://fcb3b86bb319.ngrok.io/weatherapi' //this is a random example, generate your own with ngrok.
+	const fetchAddress = 'http://fcb3b86bb319.ngrok.io/weatherapi' //this is a random example, generate your own with ngrok.
 	useEffect(() => {
-		fetch(fetchAdress)
+		fetch(fetchAddress)
 			.then((response) => response.json())
 			.then((res) => {
 				setResponse(res);
