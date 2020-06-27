@@ -17,19 +17,19 @@ export default function App() {
 			<Stack.Navigator
 				screenOptions={{
 					headerStyle: {
-						backgroundColor: "#486577",
-						shadowColor: "#0e0e11",
+						backgroundColor: "#000",
+						shadowColor: "#dbdbdb",
 					},
 					title: 'PRECISION WEATHER',
 					headerTitleStyle: {
 						fontSize: 25,
 						fontFamily: "Helvetica",
-						color: "#bae5de"
+						color: "#ffb000"
 					},
 					headerBackTitleStyle: {
-						color: "#bae5de",
+						color: "#ffb000",
 					},
-					headerTintColor: "#bae5de"
+					headerTintColor: "#ffb000"
 				}}
 			>
 				<Stack.Screen name="home" component={HomeScreen} />
@@ -39,19 +39,19 @@ export default function App() {
 	)
 }
 
-function formulaPage({ navigation }) {
+function formulaPage() {
 	return (
 		<View style={styles.container}>
-			<Text style={{ textAlign: "center", marginTop: 10, fontSize: 20 }}>To calculate the accuracy of a weather provider, I use the Root-mean-square deviation (RMSD for short) formula.</Text>
+			<Text style={{ textAlign: "center", marginTop: 10, fontSize: 20, color: "#fff" }}>To calculate the accuracy of a weather provider, I use the Root-mean-square deviation (RMSD for short) formula.</Text>
 		</View>
 	)
 }
 
 function HomeScreen({ navigation }) {
 	const [response, setResponse] = useState({});
-
+	const fetchAdress = 'http://fcb3b86bb319.ngrok.io/weatherapi' //this is a random example, generate your own with ngrok.
 	useEffect(() => {
-		fetch("http://a963139e37dc.ngrok.io/weatherapi")
+		fetch(fetchAdress)
 			.then((response) => response.json())
 			.then((res) => {
 				setResponse(res);
@@ -77,7 +77,7 @@ function HomeScreen({ navigation }) {
 
 	return (
 		<View style={styles.container}>
-			<Text style={{ textAlign: "center", marginTop: 10 }}>(Smaller is better)</Text>
+			<Text style={{ textAlign: "center", marginTop: 10, color: "#fff" }}>(Smaller is better)</Text>
 			{Object.keys(response).length === 0 ? (
 				null
 			) : (
@@ -87,7 +87,7 @@ function HomeScreen({ navigation }) {
 							renderItem={({ item }) => (
 								<View style={styles.item}>
 									<Text style={{
-										fontSize: 25, fontFamily: "Helvetica", color: "#e4f1f2"
+										fontSize: 25, fontFamily: "Helvetica", color: "#fff"
 									}}>
 										Accuracy of {item.name}: ±{item.response}°C
 								</Text>
@@ -113,7 +113,7 @@ function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#517185",
+		backgroundColor: "#000",
 		flexDirection: "column",
 	},
 	item: {
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
 		paddingLeft: 10,
 		justifyContent: "center",
 		borderBottomWidth: 0.3,
-		borderColor: "#0e0e11",
+		borderColor: "#dbdbdb",
 	},
 	formulalink: {
 		marginBottom: 150,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
 	formulatext: {
 		fontSize: 20,
 		fontFamily: "Helvetica",
-		color: "#fffff2",
+		color: "#fff",
 		textDecorationLine: "underline",
 	}
 });
